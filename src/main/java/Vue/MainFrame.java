@@ -82,7 +82,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Publicom [Shizu est magnifique]");
+        setTitle("Publicom_Admin");
         setBackground(new java.awt.Color(0, 0, 0));
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.PAGE_AXIS));
 
@@ -251,24 +251,30 @@ public class MainFrame extends javax.swing.JFrame {
                     utilisateurDao = new UtilisateurDao(utilisateur);
                     UtilisateurModel createdUtilisateur = utilisateurDao.insert(utilisateur);
                     this.tableModel.addUtilisateur(utilisateur);
+                    
+                    //vider les champs de texte
+                    this.tfPrenom.setText("");
+                    this.tfNom.setText("");
+                    this.tfMail.setText("");
+                    this.tfMotDePasse.setText("");
                 } catch (SQLException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, "Erreur Serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Erreur Serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } catch(EmailAlreadyExistException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, "Email existe deja", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Email existe deja", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Erreur Inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Erreur Inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
                     System.err.println("Mainframe.btnAddUserActionPerformed() : " + ex.getMessage());
                 }
             } else {
-                JOptionPane.showMessageDialog(null, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Erreur inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erreur inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnAddUserActionPerformed
 
@@ -311,7 +317,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (selectedRows.length == 1) {
             int selectedRow = selectedRows[0];
             UtilisateurModel utilisateur = this.tableModel.getRow(selectedRow);
-            String newPass = JOptionPane.showInputDialog(this, "mon message", "**********");
+            String newPass = JOptionPane.showInputDialog(this, "Nouveau Mot de passe", "Nouveau Mot de passe", JOptionPane.QUESTION_MESSAGE);
             Crypt chiffrement = new Crypt();
             CheckedValue checkedPassword = chiffrement.checkPassword(newPass);
             if (checkedPassword.isValid()) {
@@ -323,15 +329,15 @@ public class MainFrame extends javax.swing.JFrame {
                     utilisateurDao.update(utilisateur);
                 } catch (SQLException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, "Erreur Serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Erreur Serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Erreur Inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Erreur Inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(null, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "une et une seule ligne doit etre selectionne", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "une et une seule ligne doit etre selectionne", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnUpdateUserActionPerformed
