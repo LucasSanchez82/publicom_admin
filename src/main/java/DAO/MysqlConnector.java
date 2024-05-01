@@ -27,7 +27,7 @@ public class MysqlConnector {
     public static Connection getConnection() throws SQLException {
         final String PASSWORD = "publicomDb";
         final String USER = "publicomAdmin";
-        final String HOST = "172.28.36.14";
+        final String HOST = "localhost";
         if (con == null) {
             con = DriverManager.getConnection("jdbc:mysql://" + HOST + ":3306/publicom", USER, PASSWORD);
         }

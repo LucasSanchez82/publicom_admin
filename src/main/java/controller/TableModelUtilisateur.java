@@ -27,17 +27,16 @@ public class TableModelUtilisateur extends AbstractTableModel {
     private final List<String> columnNames;
     private final List<String> columnNamesWithHiddens;
 
-
     public TableModelUtilisateur() {
         this.utilisateurs = new ArrayList<>();
         this.columnNamesWithHiddens = new ArrayList<>((new UtilisateurModel()).getColumnsStr());
         var columnNamesTemp = new ArrayList<>(columnNamesWithHiddens);
-        
+
         int mdpIndex = this.columnNamesWithHiddens.indexOf(UtilisateurModel.getColumnByEnum(UtilisateurModel.TABLESENUM.MDP));
         int idIndex = this.columnNamesWithHiddens.indexOf(UtilisateurModel.getColumnByEnum(UtilisateurModel.TABLESENUM.ID));
-        
+
         columnNamesTemp.remove(mdpIndex);
-        columnNamesTemp.remove(idIndex); 
+        columnNamesTemp.remove(idIndex);
         this.columnNames = new ArrayList<>(columnNamesTemp);
         System.out.println(columnNames);
     }
@@ -61,7 +60,7 @@ public class TableModelUtilisateur extends AbstractTableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
-        
+
         return columnNames.get(columnIndex);
     }
 
@@ -105,16 +104,20 @@ public class TableModelUtilisateur extends AbstractTableModel {
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {  //update
         int hiddenColumnName = this.columnIndexVisibleToHidden(columnIndex);
-        System.out.println("indexOfHiddenColumnName :" + hiddenColumnName);
-        System.out.println("visibleColumnNameIndex :" + columnIndex);
         UtilisateurModel user = this.utilisateurs.get(rowIndex);
         String columnName = user.getColumns().get(hiddenColumnName).getName();
-        System.out.println("findedColumnName : " + columnName);
-        System.out.println("aValue : " + aValue);
-        user.set(columnName, aValue);
+        for (Column column : user.getColumns()) {
+            boolean isGoodColumn = column.getName() == columnName;
+            boolean isGoodType = column.getType().isInstance(aValue);
+            if (isGoodColumn && !isGoodType) { // bonne colonne mais mauvais type
+                throw new IllegalArgumentException();
+            } else {
+                user.set(columnName, aValue);
+            }
+        }
         fireTableCellUpdated(rowIndex, hiddenColumnName);
     }
-    
+
     private int columnIndexVisibleToHidden(int columnIndex) {
         String visibleColumnName = this.columnNames.get(columnIndex);
         return this.columnNamesWithHiddens.indexOf(visibleColumnName);
