@@ -4,20 +4,8 @@
  */
 package Vue;
 
-import DAO.UtilisateurDao;
-import Model.UtilisateurModel;
+import controller.ControllerMainframe;
 import controller.TableModelUtilisateur;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import utils.CheckedValue;
-import utils.Crypt;
-import utils.exception.EmailAlreadyExistException;
-import utils.validityClass.Email;
-import utils.validityClass.Nom;
-import utils.validityClass.Prenom;
 
 /**
  *
@@ -29,20 +17,12 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     private TableModelUtilisateur tableModel;
+    private ControllerMainframe controllerMainframe;
 
     public MainFrame() {
         this.tableModel = new TableModelUtilisateur();
+        this.controllerMainframe = new ControllerMainframe(this);
         initComponents();
-        UtilisateurModel utilisateurModel = new UtilisateurModel();
-        try {
-            UtilisateurDao utilisateurDao = new UtilisateurDao(utilisateurModel);
-            List<UtilisateurModel> allUtilisateurs = utilisateurDao.getAll();
-            for (UtilisateurModel utilisateur : allUtilisateurs) {
-                this.tableModel.addUtilisateur(utilisateur);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     /**
@@ -200,7 +180,7 @@ public class MainFrame extends javax.swing.JFrame {
         PanelTable.setBackground(new java.awt.Color(51, 51, 51));
 
         tableUser.setForeground(new java.awt.Color(51, 51, 51));
-        tableUser.setModel(this.tableModel);
+        tableUser.setModel(this.controllerMainframe.getTableModelUtilisateur());
         jScrollPane1.setViewportView(tableUser);
 
         javax.swing.GroupLayout PanelTableLayout = new javax.swing.GroupLayout(PanelTable);
@@ -234,48 +214,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_tfMotDePasseActionPerformed
 
     private void btnAddUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUserActionPerformed
-        try {
-
-            Prenom prenom = new Prenom(this.tfPrenom.getText());
-            Nom nom = new Nom(this.tfNom.getText());
-            Email mail = new Email(this.tfMail.getText());
-            String motDePasse = this.tfMotDePasse.getText();
-            Crypt chiffrement = new Crypt();
-
-            var checkedPassword = chiffrement.checkPassword(motDePasse);
-            if (checkedPassword.isValid()) {
-                String password = chiffrement.hash(motDePasse);
-                UtilisateurModel utilisateur = new UtilisateurModel(nom, prenom, mail, false, password);
-                UtilisateurDao utilisateurDao;
-                try {
-                    utilisateurDao = new UtilisateurDao(utilisateur);
-                    UtilisateurModel createdUtilisateur = utilisateurDao.insert(utilisateur);
-                    this.tableModel.addUtilisateur(utilisateur);
-                    
-                    //vider les champs de texte
-                    this.tfPrenom.setText("");
-                    this.tfNom.setText("");
-                    this.tfMail.setText("");
-                    this.tfMotDePasse.setText("");
-                } catch (SQLException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(this, "Erreur Serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
-                } catch(EmailAlreadyExistException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(this, "Email existe deja", "Erreur", JOptionPane.ERROR_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Erreur Inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    System.err.println("Mainframe.btnAddUserActionPerformed() : " + ex.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(this, "Erreur inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
-        }
+        this.controllerMainframe.addUser(this.tfPrenom, this.tfNom, this.tfMail, this.tfMotDePasse);
     }//GEN-LAST:event_btnAddUserActionPerformed
 
     private void btnAddUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddUserMouseClicked
@@ -283,63 +222,15 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddUserMouseClicked
 
     private void btnDelUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelUserActionPerformed
-        int[] selectedRows = this.tableUser.getSelectedRows();
-
-        /*
-         * Boucle inverse pour supprimer les lignes du tableau par le bas Sinon
-         * des exceptions apparaissent. Pourquoi : tableau de taille 4. je
-         * recupere la valeur 0 pour la supprimer. je la supprime (tableau
-         * taille 3) je recupere la valeur 1 pour la supprimer. je la supprime
-         * (tableau taille 2) je recupere la valeur 2 pour la supprimer. je la
-         * supprime impossible puisque la derniere valeur est en position 1
-         */
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            System.out.println("i : " + i);
-            int selectedRow = selectedRows[i];
-            UtilisateurModel selectedUser = this.tableModel.getRow(selectedRow);
-            try {
-                UtilisateurDao utilisateurDao = new UtilisateurDao(selectedUser);
-                utilisateurDao.delete(selectedUser);
-                this.tableModel.removeUtilisateur(selectedUser);
-            } catch (SQLException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        this.controllerMainframe.delUser(tableUser);
     }//GEN-LAST:event_btnDelUserActionPerformed
 
     private void btnDelUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDelUserMouseClicked
         // TODO add your handling code here:
-        System.out.println("Del");
     }//GEN-LAST:event_btnDelUserMouseClicked
 
     private void btnUpdateUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateUserActionPerformed
-        int[] selectedRows = this.tableUser.getSelectedRows();
-        if (selectedRows.length == 1) {
-            int selectedRow = selectedRows[0];
-            UtilisateurModel utilisateur = this.tableModel.getRow(selectedRow);
-            String newPass = JOptionPane.showInputDialog(this, "Nouveau Mot de passe", "Nouveau Mot de passe", JOptionPane.QUESTION_MESSAGE);
-            Crypt chiffrement = new Crypt();
-            CheckedValue checkedPassword = chiffrement.checkPassword(newPass);
-            if (checkedPassword.isValid()) {
-                String hashedPassword = chiffrement.hash(newPass);
-                utilisateur.set(UtilisateurModel.TABLESENUM.MDP, hashedPassword);
-                UtilisateurDao utilisateurDao;
-                try {
-                    utilisateurDao = new UtilisateurDao(utilisateur);
-                    utilisateurDao.update(utilisateur);
-                } catch (SQLException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(this, "Erreur Serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Erreur Inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "une et une seule ligne doit etre selectionne", "Erreur", JOptionPane.ERROR_MESSAGE);
-        }
-
+        this.controllerMainframe.updateUser(tableUser);
     }//GEN-LAST:event_btnUpdateUserActionPerformed
 
     /**

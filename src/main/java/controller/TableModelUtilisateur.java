@@ -142,4 +142,7 @@ public class TableModelUtilisateur extends AbstractTableModel {
         return Collections.unmodifiableList(this.utilisateurs); // Return unmodifiable list to prevent external modification
     }
 
+    public void cleanUtilisateurs() {
+        this.utilisateurs = new ArrayList<>();
+    }
 }
