@@ -86,27 +86,18 @@ public class UtilisateurModel extends Model {
         return (int) super.get(getColumnByEnum(TABLESENUM.ID));
     }
     
-    public List<Object> getValues (){
+    
+    public List<Object> getValues() {
         ArrayList<Object> values = new ArrayList<>();
-        Object nom = super.get(getColumnByEnum(TABLESENUM.NOM));
-        Object prenom = super.get(getColumnByEnum(TABLESENUM.PRENOM));
-        Object email = super.get(getColumnByEnum(TABLESENUM.EMAIL));
-        Object isAdmin = super.get(getColumnByEnum(TABLESENUM.ISADMIN));
-        Object mdp = super.get(getColumnByEnum(TABLESENUM.MDP));
-        values.add(nom);
-        values.add(prenom);
-        values.add(email);
-        values.add(isAdmin);
-        values.add(mdp);
-        
-        /*
-         * Ici je parcours ma liste et je regarde si les elements sont de type ValidityClass
-         * Si oui je ne pourrai pas l'utiliser dans mon sql donc je recupere sa valeur sous un type primitif (int, string...)
-         * sinon je garde le meme
-         * le tout retourne un map que je pourrai transformer en liste pour avoir une liste sans ValidityClass
-         */
+        for (TABLESENUM columnEnum : TABLESENUM.values()) {
+            if (columnEnum != TABLESENUM.ID) {
+                Object value = super.get(getColumnByEnum(columnEnum));
+                values.add(value);
+            }
+        }
         return values;
     }
+
     
     public void setId(int id) {
         super.set(getColumnByEnum(TABLESENUM.ID), id);
