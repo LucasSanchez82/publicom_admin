@@ -23,7 +23,7 @@ public abstract class SuperDao<T extends Model> {
 
     protected T model;
     private Connection connection;
-    private QueryBuilder queryBuilder;
+    protected QueryBuilder queryBuilder;
     private Component component;
 
     protected SuperDao(T model) throws SQLException {

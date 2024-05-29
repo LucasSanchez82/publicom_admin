@@ -7,6 +7,7 @@ package controller;
 import DAO.UtilisateurDao;
 import Model.UtilisateurModel;
 import Vue.MainFrame;
+import Vue.TableauMessages;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -150,6 +151,18 @@ public class ControllerMainframe {
             } else {
                 JOptionPane.showMessageDialog(this.mainFrame, checkedPassword.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(this.mainFrame, "une et une seule ligne doit etre selectionne", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void showMessages(JTable tableUser) {
+        int[] selectedRows = tableUser.getSelectedRows();
+        if (selectedRows.length == 1) {
+            int selectedRow = selectedRows[0];
+            UtilisateurModel utilisateur = this.tableModel.getRow(selectedRow);
+            TableauMessages tableauMessages = new TableauMessages(utilisateur);
+            tableauMessages.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this.mainFrame, "une et une seule ligne doit etre selectionne", "Erreur", JOptionPane.ERROR_MESSAGE);
         }

@@ -125,6 +125,7 @@ public class QueryBuilder {
             query += limitStr;
         }
         query += ";";
+        System.out.println(query);
         return query;
     }
 
